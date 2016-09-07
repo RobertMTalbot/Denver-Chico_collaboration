@@ -111,7 +111,7 @@ lvl2$instrument <- factor(lvl2$PCA*1 + lvl2$IMCA*2 + lvl2$GCA*3 + lvl2$CINS*4 + 
 
 #Bring lvl2 into lvl1
 
-combo <- left_join(lvl1, lvl2, by = "Assessment_Sequence_ID")
+combo <- left_join(lvl1, lvl2[,c("Assessment_Sequence_ID", "instrument")], by = "Assessment_Sequence_ID")
 
 #plots
 
