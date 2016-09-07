@@ -16,29 +16,32 @@ write.csv(newdf, "~/drive/consulting/ben_van_dusen/amended_exampledata.csv")
 
 #Multiple Linear Regression
 
-fit.equation <- lm(Effect.size ~ male, data=lvl1_clean2) #"*" is interaction effect and the terms indepedantly
+fit.equation <- lm(Effect.size ~ PRE.score + male, data=lvl1_clean2) #"*" is interaction effect and the terms indepedantly
 
 #count students in specific conditions (i.e. by instrument with and without LAs) - Need to add a course level count
 
-lvl1_clean2 %>%
-  group_by(Instrument, URM, LApresence) %>%
+combo %>%
+  group_by(instrument, gender) %>%
   summarise(n=n())
 
 #replace NA with calculated value (course average or MLR prediction)
 
-dump$Race <- as.factor(dump$Race)
+boxplot(lvl1$POST.score ~ lvl1$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)
 
 lvl1_po <- lvl1
+lvl1_po$u <- 1:nrow(lvl1_po)
 
 postpred <- lm(POST.score ~ PRE.score + male, data=lvl1_po)
 
 summary(postpred)
 
-NApost <- filter(lvl1_po, is.na(POST.score)) #== is question, = is setting the value
+NApost <- filter(lvl1_po, is.na(POST.score) & !is.na(PRE.score)) #== is question, = is setting the value
 
-matched <- match(NApost$Student_ID, lvl1_po$Student_ID)
+matched <- match(NApost$u, lvl1_po$u)
 
-lvl1_po$POST.score[matched] <- predict(postpred, lvl1_po=NApost)
+lvl1_po$POST.score[matched] <- predict(postpred, newdata=NApost)
+
+
 
 lvl1_popre <- lvl1_po
 
@@ -46,11 +49,11 @@ prepred <- lm(PRE.score ~ POST.score + male, data=lvl1_popre) #predicting the pr
 
 summary(prepred)
 
-NApre <- filter(lvl1_popre, is.na(PRE.score)) #== is question, = is setting the value
+NApre <- filter(lvl1_popre, is.na(PRE.score) & !is.na(POST.score)) #== is question, = is setting the value
 
-matched <- match(NApre$Student_ID, lvl1_popre$Student_ID)
+matched <- match(NApre$u, lvl1_popre$u)
 
-lvl1_popre$PRE.score[matched] <- predict(prepred, lvl1_po=NApost)
+lvl1_popre$PRE.score[matched] <- predict(prepred, newdata=NApre)
 
 
 #how to show values in variable
@@ -75,7 +78,7 @@ lvl1_Calc <- lvl1_popre %>%
 # Filtering
 ?filter # filter = things to keep
 
-lvl1_clean1 <- lvl1_Calc %>%
+lvl1_clean1 <- lvl1 %>%
   filter(Effect.size < 4 , Effect.size > -2)  # "|" is an or, "," is an and
 #filter(Instrument == 7 | Instrument == 8)  
 ##filter(`Effect.size` > -2) # %>% # remove the previous # to add steps
@@ -87,17 +90,30 @@ lvl1_clean1 <- lvl1_Calc %>%
 
 #delete courses and students with <10 students (uses 2 datasets)
 
-x <- lvl1_clean1 %>%
+x <- lvl1 %>%
   select(Assessment_Sequence_ID, Effect.size) %>%
   na.omit() %>%
   group_by(Assessment_Sequence_ID) %>%
   summarise(n=n()) %>%
   filter(n > 10)
 
-
-lvl1_clean2 <- lvl1_clean1 %>%
+lvl1_clean2 <- lvl1 %>%
   filter(Assessment_Sequence_ID %in% x$Assessment_Sequence_ID)
 
+lvl2_clean2 <- lvl2 %>%
+  filter(Assessment_Sequence_ID %in% x$Assessment_Sequence_ID)
+
+#turn dummy variable in a single variable
+
+lvl1$gender <- factor(lvl1$male*1 + lvl1$female*2 + lvl1$transgender*3 + lvl1$other*4, labels = c("NA", "male", "female", "transgender", "other"))
+
+lvl2$instrument <- factor(lvl2$PCA*1 + lvl2$IMCA*2 + lvl2$GCA*3 + lvl2$CINS*4 + lvl2$GCIICS*5 + lvl2$CCI*6 + lvl2$FMCE*7 + lvl2$BEMA*8 + lvl2$FCI*9 + lvl2$CSEM*10 + lvl2$LSCI*11, labels = c("PCA", "IMCA", "GCA", "CINS", "GCIICS", "CCI", "FMCE", "BEMA", "FCI", "CSEM", "LSCI"))
+
+#Bring lvl2 into lvl1
+
+combo <- left_join(lvl1, lvl2, by = "Assessment_Sequence_ID")
+
+#plots
 
 plot(lvl1_clean2$CohensD, lvl1_clean2$LGcourse)
 plot(lvl1_clean2$CohensD, lvl1_clean2$LGind)
