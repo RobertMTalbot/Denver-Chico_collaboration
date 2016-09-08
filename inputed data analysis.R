@@ -35,6 +35,11 @@ lvl1_inp$gender_URM <- factor(lvl1_inp$male*1 + lvl1_inp$female*2 + lvl1_inp$tra
 
 lvl1_inp <- left_join(lvl1_inp, lvl2_inp[,c("Assessment_Sequence_ID", "instrument")], by = "Assessment_Sequence_ID")
 
+#filter for students
+lvl1_inp <- lvl1_inp %>%
+  filter(Student.or.LA == 0)
+  filter(PRE.score < 100)
+
 #replace NA with calculated value (course average or MLR prediction)
 
 boxplot(lvl1_inp$POST.score ~ lvl1_inp$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)

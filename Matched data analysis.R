@@ -35,6 +35,11 @@ lvl1$gender_URM <- factor(lvl1$male*1 + lvl1$female*2 + lvl1$transgender*2 + lvl
 
 lvl1 <- left_join(lvl1, lvl2[,c("Assessment_Sequence_ID", "instrument")], by = "Assessment_Sequence_ID")
 
+#filter for students
+lvl1 <- lvl1 %>%
+  filter(Student.or.LA == 0) %>%
+  filter(PRE.score < 100)
+
 #Calculate Cohen's d, LGcourse, and LGind
 
 lvl1 <- lvl1 %>% 
@@ -54,7 +59,6 @@ lvl1 <- lvl1 %>%
 
 lvl1 <- lvl1 %>%
   filter(CohensD < 4 , CohensD > -1) %>%
-  filter(PRE.score < 100)
 #filter("PRE.Duration..Seconds." > 300) %>%
 #filter("POST.Duration..Seconds." > 300)
 # "|" is an or, "," is an and
