@@ -14,6 +14,8 @@ lvl2 <- read.csv("/Users/bvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_
 
 write.csv(newdf, "~/drive/consulting/ben_van_dusen/amended_exampledata.csv")
 
+gls(y ~ x1 + x2 + instrument, data=d, weights=varIdent(form= ~1|instrument))
+
 #Multiple Linear Regression
 
 fit.equation <- lm(Effect.size ~ PRE.score + male, data=lvl1_clean2) #"*" is interaction effect and the terms indepedantly
