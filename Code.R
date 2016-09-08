@@ -14,8 +14,12 @@ lvl2 <- read.csv("/Users/bvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_
 
 write.csv(newdf, "~/drive/consulting/ben_van_dusen/amended_exampledata.csv")
 
+<<<<<<< HEAD
 #Add row #s
 lvl1$u <- 1:nrow(lvl1)
+=======
+gls(y ~ x1 + x2 + instrument, data=d, weights=varIdent(form= ~1|instrument))
+>>>>>>> 4ab669b2f922bef5a2a562c7e624b7e9bd5d8022
 
 #Multiple Linear Regression
 
