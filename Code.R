@@ -1,4 +1,5 @@
 library(dplyr)
+library(nlme)
 
 #BVD read in (laptop)
 lvl1 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
