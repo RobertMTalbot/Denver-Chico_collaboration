@@ -14,9 +14,12 @@ lvl2 <- read.csv("/Users/bvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_
 
 write.csv(newdf, "~/drive/consulting/ben_van_dusen/amended_exampledata.csv")
 
+#Add row #s
+lvl1$u <- 1:nrow(lvl1)
+
 #Multiple Linear Regression
 
-fit.equation <- lm(Effect.size ~ PRE.score + male, data=lvl1_clean2) #"*" is interaction effect and the terms indepedantly
+fit.equation <- gls(POST.score ~ PRE.score + gender + instrument, data=lvl1, weights=varIdent(form= ~1|instrument)) #"*" is interaction effect and the terms indepedantly
 
 #count students in specific conditions (i.e. by instrument with and without LAs) - Need to add a course level count
 
@@ -29,9 +32,8 @@ combo %>%
 boxplot(lvl1$POST.score ~ lvl1$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)
 
 lvl1_po <- lvl1
-lvl1_po$u <- 1:nrow(lvl1_po)
 
-postpred <- lm(POST.score ~ PRE.score + male, data=lvl1_po)
+postpred <- gls(POST.score ~ PRE.score + gender + instrument, data=lvl1_po, weights=varIdent(form= ~1|instrument))
 
 summary(postpred)
 
@@ -45,7 +47,7 @@ lvl1_po$POST.score[matched] <- predict(postpred, newdata=NApost)
 
 lvl1_popre <- lvl1_po
 
-prepred <- lm(PRE.score ~ POST.score + male, data=lvl1_popre) #predicting the pre
+prepred <- gls(PRE.score ~ POST.score + gender + instrument, data=lvl1_popre, weights=varIdent(form= ~1|instrument)) #predicting the pre
 
 summary(prepred)
 

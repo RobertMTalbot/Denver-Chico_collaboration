@@ -1,6 +1,7 @@
 #inputed data analysis
 
 library(dplyr)
+library(nlme)
 
 #BVD read in (laptop)
 lvl1_inp <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
@@ -46,7 +47,8 @@ boxplot(lvl1_inp$POST.score ~ lvl1_inp$instrument) #check to see if boxes are ta
 
 lvl1_inp_po <- lvl1_inp
 
-postpred <- lm(POST.score ~ PRE.score, data=lvl1_inp_po)
+postpred <- gls(POST.score ~ PRE.score + instrument, data=lvl1_inp_po, weights=varIdent(form= ~1|instrument))
+  #lm(POST.score ~ PRE.score, data=lvl1_inp_po)
 
 summary(postpred)
 
