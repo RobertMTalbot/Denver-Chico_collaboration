@@ -47,8 +47,7 @@ boxplot(lvl1_inp$POST.score ~ lvl1_inp$instrument) #check to see if boxes are ta
 
 lvl1_inp_po <- lvl1_inp
 
-postpred <- gls(POST.score ~ PRE.score + instrument, data=lvl1_inp_po, weights=varIdent(form= ~1|instrument))
-  #lm(POST.score ~ PRE.score, data=lvl1_inp_po)
+postpred <- gls(POST.score ~ PRE.score + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument))
 
 summary(postpred)
 
@@ -62,7 +61,7 @@ lvl1_inp_po$POST.score[matched] <- predict(postpred, newdata=NApost)
 
 lvl1_inp_popre <- lvl1_inp_po
 
-prepred <- lm(PRE.score ~ POST.score + male, data=lvl1_inp_popre) #predicting the pre
+prepred <- gls(PRE.score ~ POST.score + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) #predicting the pre
 
 summary(prepred)
 
@@ -121,28 +120,40 @@ lvl2_inp <- lvl2_inp %>%
 
 #Multiple Linear Regression by pre-score
 
-dfit_inp <- lm(CohensD ~ PRE.score, data=lvl1_inp) 
+dfit_inp <- lm(CohensD ~ PRE.score, data=lvl1_inp) # no controlling for instrument differences
+dfit_inp_inst <- gls(CohensD ~ PRE.score + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 
 summary(dfit_inp)
+summary(dfit_inp_inst)
 
-LGindfit_inp <- lm(LGind ~ PRE.score, data=lvl1_inp) 
+LGindfit_inp <- lm(LGind ~ PRE.score, data=lvl1_inp) # no controlling for instrument differences
+LGindfit_inp_inst <- gls(LGind ~ PRE.score + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 
 summary(LGindfit_inp)
+summary(LGindfit_inp_inst)
 
-LGcoursefit_inp <- lm(LGcourse ~ PRE.score, data=lvl1_inp) 
+LGcoursefit_inp <- lm(LGcourse ~ PRE.score, data=lvl1_inp) # no controlling for instrument differences
+LGcoursefit_inp_inst <- gls(LGcourse ~ PRE.score + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 
 summary(LGcoursefit_inp)
+summary(LGcoursefit_inp_inst)
 
 #Multiple Linear Regression by gender and race
 
-dfit_inp <- lm(CohensD ~ gender_URM + race_URM, data=lvl1_inp) 
+dfit_inp<- lm(CohensD ~ gender_URM + race_URM, data=lvl1_inp) # no controlling for instrument differences
+dfit_inp_inst <- gls(CohensD ~ gender_URM + race_URM + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 
 summary(dfit_inp)
+summary(dfit_inp_inst)
 
-LGindfit_inp <- lm(LGind ~ gender_URM + race_URM, data=lvl1_inp) 
+LGindfit_inp <- lm(LGind ~ gender_URM + race_URM, data=lvl1_inp) # no controlling for instrument differences
+LGindfit_inp_inst <- gls(LGind ~ gender_URM + race_URM + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 
 summary(LGindfit_inp)
+summary(LGindfit_inp_inst)
 
-LGcoursefit_inp <- lm(LGcourse ~ gender_URM + race_URM, data=lvl1_inp) 
+LGcoursefit_inp <- lm(LGcourse ~ gender_URM + race_URM, data=lvl1_inp) # no controlling for instrument differences
+LGcoursefit_inp_inst <- gls(LGcourse ~ gender_URM + race_URM + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 
 summary(LGcoursefit_inp)
+summary(LGcoursefit_inp_inst)
