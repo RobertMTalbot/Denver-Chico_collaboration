@@ -44,7 +44,7 @@ lvl1 <- lvl1 %>%
 
 lvl1 <- lvl1 %>% 
   group_by(Assessment_Sequence_ID) %>%
-  select(POST.score, PRE.score, row, instrument, gender_URM, race_URM, race, gender, PRE.Duration..Seconds., POST.Duration..Seconds.) %>%
+  select(Assessment_Sequence_ID, POST.score, PRE.score, row, instrument, gender_URM, race_URM, race, gender, PRE.Duration..Seconds., POST.Duration..Seconds.) %>%
   na.omit() %>%
   mutate(n1=length(PRE.score[!is.na(PRE.score)]),
          n2=length(POST.score[!is.na(POST.score)]),

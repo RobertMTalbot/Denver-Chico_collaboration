@@ -71,7 +71,7 @@ unique(lvl1$male)
 
 lvl1_Calc <- lvl1_popre %>% 
   group_by(Assessment_Sequence_ID) %>%
-  select(POST.score, PRE.score, Effect.size) %>%
+  select(POST.score, PRE.score, Effect.size, Assessment_Sequence_ID) %>%
   na.omit() %>%
   mutate(n1=length(PRE.score[!is.na(PRE.score)]),
          n2=length(POST.score[!is.na(POST.score)]),
