@@ -26,7 +26,7 @@ lvl1_inp$race <- factor(lvl1_inp$white*1 + lvl1_inp$black*2 + lvl1_inp$asian*3 +
 
 #white is Dom
 lvl1_inp$race_URM <- factor(lvl1_inp$white*1 + lvl1_inp$black*2 + lvl1_inp$asian*2 + lvl1_inp$american_indian*2 + lvl1_inp$hawaiian_or_other_pacific_islander*2 + lvl1_inp$other.1*2, labels = c("NA", "Dom", "NonDom"))
-
+  
 #male is Dom
 lvl1_inp$gender_URM <- factor(lvl1_inp$male*1 + lvl1_inp$female*2 + lvl1_inp$transgender*2 + lvl1_inp$other*2, labels = c("NA", "Dom", "NonDom"))
 
@@ -115,11 +115,17 @@ summary(LGcoursefit_inp)
 
 #Multiple Linear Regression by gender and race
 
-dfit_inp <- gls(CohensD ~ gender_URM + race_URM + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
+lvl1_inp_gen_race <- lvl1_inp %>%
+  filter(gender_URM == "Dom" | gender_URM =="NonDom") %>%
+  filter(race_URM == "Dom" | race_URM =="NonDom")
+
+unique(lvl1_inp_gen_race$race_URM)
+
+dfit_inp <- gls(CohensD ~ gender_URM + race_URM, data=na.omit(lvl1_inp_gen_race), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 summary(dfit_inp)
 
-LGindfit_inp <- gls(LGind ~ gender_URM + race_URM + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
+LGindfit_inp <- gls(LGind ~ gender_URM + race_URM, data=na.omit(lvl1_inp_gen_race), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 summary(LGindfit_inp)
 
-LGcoursefit_inp <- gls(LGcourse ~ gender_URM + race_URM + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
+LGcoursefit_inp <- gls(LGcourse ~ gender_URM + race_URM, data=na.omit(lvl1_inp_gen_race), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 summary(LGcoursefit_inp)
