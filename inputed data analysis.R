@@ -74,11 +74,9 @@ lvl1_inp_popre$PRE.score[matched] <- predict(prepred, newdata=NApre)
 
 #Calculate Cohen's d, LGcourse, and LGind
 
-lvl1_inp_popre$Assessment_Sequence_ID <- factor(lvl1_inp_popre$Assessment_Sequence_ID)
-
 lvl1_inp_ <- lvl1_inp_popre %>% 
   group_by(Assessment_Sequence_ID) %>%
-  select(POST.score, PRE.score, row, instrument, gender_URM, race_URM, race, gender, PRE.Duration..Seconds., POST.Duration..Seconds.) %>%
+  select(Assessment_Sequence_ID, POST.score, PRE.score, row, instrument, gender_URM, race_URM, race, gender, PRE.Duration..Seconds., POST.Duration..Seconds.) %>%
   na.omit() %>%
   mutate(n1=length(PRE.score[!is.na(PRE.score)]),
          n2=length(POST.score[!is.na(POST.score)]),
@@ -89,7 +87,6 @@ lvl1_inp_ <- lvl1_inp_popre %>%
          LGcourse=(POST.score-PRE.score)/(100-Preave),
          LGind=(POST.score-PRE.score)/(100-PRE.score))
 
-unique(lvl1_inp_popre$Assessment_Sequence_ID)
 # filter = things to keep
 
 lvl1_inp <- lvl1_inp %>%
