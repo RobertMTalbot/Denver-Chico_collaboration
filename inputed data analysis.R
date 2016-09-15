@@ -104,13 +104,13 @@ lvl2_inp <- lvl2_inp %>%
 
 #Multiple Linear Regression by pre-score
 
-dfit_inp <- gls(CohensD ~ PRE.score * instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
+dfit_inp <- gls(CohensD ~ PRE.score, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 summary(dfit_inp)
 
-LGindfit_inp <- gls(LGind ~ PRE.score * instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
+LGindfit_inp <- gls(LGind ~ PRE.score, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 summary(LGindfit_inp)
 
-LGcoursefit_inp <- gls(LGcourse ~ PRE.score + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
+LGcoursefit_inp <- gls(LGcourse ~ PRE.score, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 summary(LGcoursefit_inp)
 
 #Multiple Linear Regression by gender and race
