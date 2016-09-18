@@ -122,10 +122,13 @@ plot(lvl1_clean2$LGcourse, lvl1_clean2$LGind)
 
 library(mvoutlier)
 
-lvl1_3d <- lvl1_inp%>%
+lvl1_3d <- lvl1_inp %>%
   select(CohensD,LGind,LGcourse)
 
-outliers <- aq.plot(lvl1_3d, delta=qchisq(0.975, df=ncol(x)), quan=1/2, alpha=0.05)
+lvl1_3d2 <- lvl1_3d%>%
+  select(lvl1_3d, -Assessment_Sequence_ID) #This code doesn't work
+
+lvl1_inp$outliers <- aq.plot(lvl1_3d, delta=qchisq(0.975, df=ncol(x)), quan=1/2, alpha=0.05)
 aq.plot(lvl1_3d, alpha=0.1)
 
 plot(aq.plot)
