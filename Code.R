@@ -71,6 +71,7 @@ lvl1_Calc <- lvl1_popre %>%
          sd2=sd(POST.score, na.rm=TRUE),
          CohensD=(POST.score-PRE.score)/sqrt(((n1-1)*sd1^2 + (n2-1)*sd2^2)/(n1+n2)),
          Preave=mean(PRE.score, na.rm = TRUE),
+         Postave=mean(POST.score, na.rm = TRUE),
          LGcourse=(POST.score-PRE.score)/(100-Preave),
          LGind=(POST.score-PRE.score)/(100-PRE.score))
 
