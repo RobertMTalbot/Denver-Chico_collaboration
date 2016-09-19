@@ -2,13 +2,9 @@
 
 library(dplyr)
 
-#BVD read in (laptop)
+#BVD read in (laptop & home)
 lvl1 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
 lvl2 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
-
-#BVD read in (home)
-lvl1 <- read.csv("/Users/benvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
-lvl2 <- read.csv("/Users/benvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
 
 #BVD read in (work)
 lvl1 <- read.csv("/Users/bvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
@@ -37,8 +33,8 @@ lvl1 <- left_join(lvl1, lvl2[,c("Assessment_Sequence_ID", "instrument")], by = "
 
 #filter for students
 lvl1 <- lvl1 %>%
-  filter(Student.or.LA == 0) %>%
-  filter(PRE.score < 100)
+  filter(Student.or.LA == 0)
+#filter(PRE.score < 100 | PRE.score == NA)
 
 #Calculate Cohen's d, LGcourse, and LGind
 
@@ -88,40 +84,22 @@ lvl2 <- lvl2 %>%
 
 #Multiple Linear Regression by pre-score
 
-dfit <- lm(CohensD ~ PRE.score, data=lvl1) # no controlling for instrument differences
 dfit_inst <- gls(CohensD ~ PRE.score + instrument, data=na.omit(lvl1), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
-
-summary(dfit)
 summary(dfit_inst)
 
-LGindfit <- lm(LGind ~ PRE.score, data=lvl1) # no controlling for instrument differences
 LGindfit_inst <- gls(LGind ~ PRE.score + instrument, data=na.omit(lvl1), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
-
-summary(LGindfit)
 summary(LGindfit_inst)
 
-LGcoursefit <- lm(LGcourse ~ PRE.score, data=lvl1) # no controlling for instrument differences
 LGcoursefit_inst <- gls(LGcourse ~ PRE.score + instrument, data=na.omit(lvl1), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
-
-summary(LGcoursefit)
 summary(LGcoursefit_inst)
 
 #Multiple Linear Regression by gender and race
 
-dfit<- lm(CohensD ~ gender_URM + race_URM, data=lvl1) # no controlling for instrument differences
 dfit_inst <- gls(CohensD ~ gender_URM + race_URM + instrument, data=na.omit(lvl1), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
-
-summary(dfit)
 summary(dfit_inst)
 
-LGindfit <- lm(LGind ~ gender_URM + race_URM, data=lvl1) # no controlling for instrument differences
 LGindfit_inst <- gls(LGind ~ gender_URM + race_URM + instrument, data=na.omit(lvl1), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
-
-summary(LGindfit)
 summary(LGindfit_inst)
 
-LGcoursefit <- lm(LGcourse ~ gender_URM + race_URM, data=lvl1) # no controlling for instrument differences
 LGcoursefit_inst <- gls(LGcourse ~ gender_URM + race_URM + instrument, data=na.omit(lvl1), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
-
-summary(LGcoursefit)
 summary(LGcoursefit_inst)
