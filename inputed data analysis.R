@@ -40,6 +40,8 @@ lvl1_inp <- lvl1_inp %>%
 #replace NA with calculated value (course average or MLR prediction)
 
 boxplot(lvl1_inp$POST.score ~ lvl1_inp$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)
+boxplot(lvl1_inp$PRE.score ~ lvl1_inp$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)
+
 
 lvl1_inp_po <- lvl1_inp
 
@@ -136,3 +138,6 @@ summary(LGindfit_inp_inst)
 
 LGcoursefit_inp_inst <- gls(LGcourse ~ gender_URM + race_URM + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) # controlling for instrument differences
 summary(LGcoursefit_inp_inst)
+
+
+boxplot(lvl1_inp$CohensD ~ lvl1_inp$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)
