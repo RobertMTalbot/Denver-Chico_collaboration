@@ -5,10 +5,6 @@ library(nlme)
 lvl1 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
 lvl2 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
 
-#BVD read in (home)
-lvl1 <- read.csv("/Users/benvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
-lvl2 <- read.csv("/Users/benvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
-
 #BVD read in (work)
 lvl1 <- read.csv("/Users/bvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
 lvl2 <- read.csv("/Users/bvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
@@ -121,3 +117,18 @@ combo <- left_join(lvl1, lvl2[,c("Assessment_Sequence_ID", "instrument")], by = 
 plot(lvl1_clean2$CohensD, lvl1_clean2$LGcourse)
 plot(lvl1_clean2$CohensD, lvl1_clean2$LGind)
 plot(lvl1_clean2$LGcourse, lvl1_clean2$LGind)
+
+#multidimension outlier analysis
+
+library(mvoutlier)
+
+lvl1_3d <- lvl1_inp %>%
+  select(CohensD,LGind,LGcourse)
+
+lvl1_3d2 <- lvl1_3d%>%
+  select(lvl1_3d, -Assessment_Sequence_ID) #This code doesn't work
+
+lvl1_inp$outliers <- aq.plot(lvl1_3d, delta=qchisq(0.975, df=ncol(x)), quan=1/2, alpha=0.05)
+aq.plot(lvl1_3d, alpha=0.1)
+
+plot(aq.plot)
