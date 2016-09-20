@@ -124,12 +124,29 @@ plot(lvl1_clean2$LGcourse, lvl1_clean2$LGind)
 library(mvoutlier)
 
 lvl1_3d <- lvl1_inp %>%
+  ungroup() %>%
   select(CohensD,LGind,LGcourse)
 
-lvl1_3d2 <- lvl1_3d%>%
-  select(lvl1_3d, -Assessment_Sequence_ID) #This code doesn't work
-
 lvl1_inp$outliers <- aq.plot(lvl1_3d, delta=qchisq(0.975, df=ncol(x)), quan=1/2, alpha=0.05)
-aq.plot(lvl1_3d, alpha=0.1)
+thingiwant <- aq.plot(lvl1_3d, alpha=0.1, quan=0.9)
+lvl1_inp$outliers <- thingiwant$outliers
 
 plot(aq.plot)
+
+#multidimension plots
+
+library(plot3D)
+
+scatter3D(x = lvl1_inp$LGind, y = lvl1_inp$LGcourse, z = lvl1_inp$CohensD, colvar = lvl1_inp$CohensD,
+                    pch = 16, cex = 1.5, xlab = "LG individual", ylab = "LG Course",
+                    zlab = "Cohen's d", 
+                    ticktype = "detailed",
+                    panel.first = NULL, theta = 10, d = 2,
+                    colkey = list(length = 0.5, width = 0.5, cex.clab = 0.75))
+
+
+
+library(rgl)
+
+with(filter(lvl1_inp, LGind>-2), plot3d(LGind, LGcourse, CohensD, col=factor(outliers, labels=c(1,2))))
+?rgl

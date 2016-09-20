@@ -46,27 +46,16 @@ boxplot(lvl1_inp$PRE.score ~ lvl1_inp$instrument) #check to see if boxes are tal
 lvl1_inp_po <- lvl1_inp
 
 postpred <- gls(POST.score ~ PRE.score + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument))
-
-summary(postpred)
-
 NApost <- filter(lvl1_inp_po, is.na(POST.score) & !is.na(PRE.score)) #== is question, = is setting the value
-
 matched <- match(NApost$row, lvl1_inp_po$row)
-
 lvl1_inp_po$POST.score[matched] <- predict(postpred, newdata=NApost)
 
 
 
 lvl1_inp_popre <- lvl1_inp_po
-
 prepred <- gls(PRE.score ~ POST.score + instrument, data=na.omit(lvl1_inp), weights=varIdent(form= ~1|instrument)) #predicting the pre
-
-summary(prepred)
-
 NApre <- filter(lvl1_inp_popre, is.na(PRE.score) & !is.na(POST.score)) #== is question, = is setting the value
-
 matched <- match(NApre$row, lvl1_inp_popre$row)
-
 lvl1_inp_popre$PRE.score[matched] <- predict(prepred, newdata=NApre)
 
 
@@ -141,3 +130,22 @@ summary(LGcoursefit_inp_inst)
 
 
 boxplot(lvl1_inp$CohensD ~ lvl1_inp$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)
+
+#multidimension outlier analysis
+
+library(mvoutlier)
+
+lvl1_3d <- lvl1_inp %>%
+  select(CohensD,LGind,LGcourse)
+
+lvl1_inp$outliers <- aq.plot(lvl1_3d, delta=qchisq(0.975, df=ncol(x)), quan=1/2, alpha=0.05)
+aq.plot(lvl1_3d, alpha=0.1)
+
+plot(aq.plot)
+
+with(lvl1_inp, plot(CohensD, LGcourse))
+with(lvl1_inp, plot(LGind, LGcourse))
+with(lvl1_inp, plot(CohensD, LGind))
+
+plot(lvl1_clean2$CohensD, lvl1_clean2$LGind)
+plot(lvl1_clean2$LGcourse, lvl1_clean2$LGind)
