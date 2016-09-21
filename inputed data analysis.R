@@ -28,6 +28,7 @@ lvl1_inp$race_URM <- factor(lvl1_inp$white*1 + lvl1_inp$black*2 + lvl1_inp$asian
 #male is Dom
 lvl1_inp$gender_URM <- factor(lvl1_inp$male*1 + lvl1_inp$female*2 + lvl1_inp$transgender*2 + lvl1_inp$other*2, labels = c("NA", "Dom", "NonDom"))
 
+
 #Bring lvl2_inp into lvl1_inp
 
 lvl1_inp <- left_join(lvl1_inp, lvl2_inp[,c("Assessment_Sequence_ID", "instrument")], by = "Assessment_Sequence_ID")
@@ -35,9 +36,19 @@ lvl1_inp <- left_join(lvl1_inp, lvl2_inp[,c("Assessment_Sequence_ID", "instrumen
 #filter for students
 lvl1_inp <- lvl1_inp %>%
   filter(Student.or.LA == 0)
-  #filter(PRE.score < 100 | PRE.score == NA)
+#filter(PRE.score < 100 | PRE.score == NA)
+#New imputation code
 
-#replace NA with calculated value (course average or MLR prediction)
+library(Amelia)
+?amelia
+
+cutdata <- lvl1_inp  %>%  
+  select(POST.score, PRE.score, First_time)
+
+new_imp <- amelia(x=cutdata, m = 5) #This seems to work but I need to get it to write the data in the lvl1_inp file (plus pick which iteration)
+
+
+#Old imputation code
 
 boxplot(lvl1_inp$POST.score ~ lvl1_inp$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)
 boxplot(lvl1_inp$PRE.score ~ lvl1_inp$instrument) #check to see if boxes are taller than other boxes. If so, then create seperate postpreds. If not, include instrument in postpred.)
@@ -136,16 +147,18 @@ boxplot(lvl1_inp$CohensD ~ lvl1_inp$instrument) #check to see if boxes are talle
 library(mvoutlier)
 
 lvl1_3d <- lvl1_inp %>%
+  ungroup() %>%
   select(CohensD,LGind,LGcourse)
 
-lvl1_inp$outliers <- aq.plot(lvl1_3d, delta=qchisq(0.975, df=ncol(x)), quan=1/2, alpha=0.05)
-aq.plot(lvl1_3d, alpha=0.1)
+thingiwant <- aq.plot(lvl1_3d, alpha=0.1, quan=0.9)
+lvl1_inp$outliers <- thingiwant$outliers
 
-plot(aq.plot)
+#Plots
 
 with(lvl1_inp, plot(CohensD, LGcourse))
 with(lvl1_inp, plot(LGind, LGcourse))
 with(lvl1_inp, plot(CohensD, LGind))
 
-plot(lvl1_clean2$CohensD, lvl1_clean2$LGind)
-plot(lvl1_clean2$LGcourse, lvl1_clean2$LGind)
+library(rgl)
+
+with(filter(lvl1_inp, LGind>-2), plot3d(LGind, LGcourse, CohensD, col=factor(outliers, labels=c(1,2))))
