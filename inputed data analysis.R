@@ -2,6 +2,7 @@
 
 library(dplyr)
 library(nlme)
+library(varhandle)
 
 #BVD read in (laptop & home)
 lvl1_inp <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
@@ -36,16 +37,33 @@ lvl1_inp <- left_join(lvl1_inp, lvl2_inp[,c("Assessment_Sequence_ID", "instrumen
 #filter for students
 lvl1_inp <- lvl1_inp %>%
   filter(Student.or.LA == 0)
+  #filter(PRE.Duration..Seconds.>300 | PRE.Duration..Seconds.==NA)
 #filter(PRE.score < 100 | PRE.score == NA)
+
+#select variables we'll be using
+
+variable.names(lvl1_inp)
+
+lvl1_inptest <- lvl1_inp %>%
+  select(Assessment_Sequence_ID, PRE.score, POST.score, First_time, Year_in_school, gender, race, instrument)
+
+?select
 #New imputation code
 
 library(Amelia)
 ?amelia
 
-cutdata <- lvl1_inp  %>%  
-  select(POST.score, PRE.score, First_time)
+bds <- matrix(c("PRE.score", "POST.score", 0, 0, 1, 1), nrow = 2, ncol = 3)
+bds
 
-new_imp <- amelia(x=cutdata, m = 5) #This seems to work but I need to get it to write the data in the lvl1_inp file (plus pick which iteration)
+a.out <- amelia(lvl1_inptest, m = 5, p2s = 1, idvars = c("Assessment_Sequence_ID", "gender", "race", "instrument"),
+                noms = NULL, ords = "Year_in_school", bounds = bds) 
+
+var(lvl1_inp)
+#cutdata <- lvl1_inp  %>%  
+  #select(POST.score, PRE.score, First_time)
+
+#new_imp <- amelia(x=cutdata, m = 5) #This seems to work but I need to get it to write the data in the lvl1_inp file (plus pick which iteration)
 
 
 #Old imputation code
