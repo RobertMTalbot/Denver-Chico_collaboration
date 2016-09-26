@@ -4,62 +4,46 @@ library(dplyr)
 library(nlme)
 
 #BVD read in (laptop & home)
-lvl1_imp <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
-lvl2_imp <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
+lvl1 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
+lvl2 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
 
 #BVD read in (work)
-lvl1_imp <- read.csv("/Users/bvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
-lvl2_imp <- read.csv("/Users/bvandusen/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
+lvl1 <- read.csv("/Users/bvandusen/Dropbox/work/Research/LASSO/data/HLM_LASSO_Dump_S2_S3_lvl1.csv")
+lvl2 <- read.csv("/Users/bvandusen/Dropbox/work/Research/LASSO/data/HLM_LASSO_Dump_S2_S3_lvl2.csv")
 
 #Assign row numbers
-lvl1_imp$row <- 1:nrow(lvl1_imp)
-
-#turn dummy variable in a single factor
-
-lvl1_imp$gender <- factor(lvl1_imp$male*1 + lvl1_imp$female*2 + lvl1_imp$transgender*3 + lvl1_imp$other*4, labels = c("NA", "male", "female", "transgender", "gender_other"))
-
-lvl2_imp$instrument <- factor(lvl2_imp$PCA*1 + lvl2_imp$IMCA*2 + lvl2_imp$GCA*3 + lvl2_imp$CINS*4 + lvl2_imp$GCIICS*5 + lvl2_imp$CCI*6 + lvl2_imp$FMCE*7 + lvl2_imp$BEMA*8 + lvl2_imp$FCI*9 + lvl2_imp$CSEM*10 + lvl2_imp$LSCI*11, labels = c("PCA", "IMCA", "GCA", "CINS", "GCIICS", "CCI", "FMCE", "BEMA", "FCI", "CSEM", "LSCI"))
-
-lvl1_imp$race <- factor(lvl1_imp$white*1 + lvl1_imp$black*2 + lvl1_imp$asian*3 + lvl1_imp$american_indian*4 + lvl1_imp$hawaiian_or_other_pacific_islander*5 + lvl1_imp$other.1*6, labels = c("NA", "white", "black", "asian", "american_indian", "hawaiian_or_other_pacific_islander", "race_other"))
-
-#white is Dom
-lvl1_imp$race_URM <- factor(lvl1_imp$white*1 + lvl1_imp$black*2 + lvl1_imp$asian*2 + lvl1_imp$american_indian*2 + lvl1_imp$hawaiian_or_other_pacific_islander*2 + lvl1_imp$other.1*2, labels = c("NA", "Dom", "NonDom"))
-
-#male is Dom
-lvl1_imp$gender_URM <- factor(lvl1_imp$male*1 + lvl1_imp$female*2 + lvl1_imp$transgender*2 + lvl1_imp$other*2, labels = c("NA", "Dom", "NonDom"))
-
+lvl1$row <- 1:nrow(lvl1)
 
 #Bring lvl2_imp into lvl1_imp
 
-lvl1_imp <- left_join(lvl1_imp, lvl2_imp[,c("Assessment_Sequence_ID", "instrument")], by = "Assessment_Sequence_ID")
+lvl1 <- left_join(lvl1, lvl2[,c("Assessment_Sequence_ID", "PCA", "IMCA", "GCA", "CINS", "CCI", "FMCE", "BEMA", "FCI", "CSEM", "LSCI")], by = "Assessment_Sequence_ID")
 
 #filter for students
-lvl1_imp <- lvl1_imp %>%
+lvl1 <- lvl1 %>%
   filter(Student.or.LA == 0)
 #filter(PRE.Duration..Seconds.>300 | PRE.Duration..Seconds.==NA)
 #filter(PRE.score < 100 | PRE.score == NA)
 
 #select variables we'll be using
 
-variable.names(lvl1_imp)
-
-lvl1_imptest <- lvl1_imp %>%
-  select(Assessment_Sequence_ID, PRE.score, POST.score, First_time, Year_in_school, gender, race, instrument)
+lvl1_cut <- lvl1 %>%
+  select(Assessment_Sequence_ID, PRE.score, POST.score, First_time, 
+         Year_in_school, PCA, IMCA, GCA, CINS, CCI, FMCE, BEMA, FCI, CSEM, LSCI)
 
 #New imputation code
 
 library(Amelia)
-?amelia
 
 bds <- matrix(c(2, 3, 0, 0, 100, 100), nrow = 2, ncol = 3)
-bds
 
-a.out <- amelia(lvl1_imptest, m = 5, idvars = c("Assessment_Sequence_ID", "gender", "race", "instrument"),
+a.out <- amelia(lvl1_cut, m = 5, idvars = c("Assessment_Sequence_ID"),
                 noms = NULL, ords = "Year_in_school", bounds = bds) 
 
-save(a.out, file ="lvl1_imps.RData")
-
-lvl1_impnew <- data.frame(a.out$imputations[[5]])
+lvl1_imp1 <- data.frame(a.out$imputations[[1]])
+lvl1_imp2 <- data.frame(a.out$imputations[[2]])
+lvl1_imp3 <- data.frame(a.out$imputations[[3]])
+lvl1_imp4 <- data.frame(a.out$imputations[[4]])
+lvl1_imp5 <- data.frame(a.out$imputations[[5]])
 
 #cutdata <- lvl1_imp  %>%  
 #select(POST.score, PRE.score, First_time)
