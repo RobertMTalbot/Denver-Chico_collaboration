@@ -19,16 +19,20 @@ lvl1$row <- 1:nrow(lvl1)
 lvl1 <- left_join(lvl1, lvl2[,c("Assessment_Sequence_ID", "PCA", "IMCA", "GCA", "CINS", "CCI", "FMCE", "BEMA", "FCI", "CSEM", "LSCI")], by = "Assessment_Sequence_ID")
 
 #filter for students
-lvl1 <- lvl1 %>%
+lvl1_filt <- lvl1 %>%
   filter(Student.or.LA == 0)
+ # filter(!is.na(POST.score) | !is.na(PRE.score))
 #filter(PRE.Duration..Seconds.>300 | PRE.Duration..Seconds.==NA)
 #filter(PRE.score < 100 | PRE.score == NA)
 
 #select variables we'll be using
 
-lvl1_cut <- lvl1 %>%
-  select(Assessment_Sequence_ID, PRE.score, POST.score, First_time, 
-         Year_in_school, PCA, IMCA, GCA, CINS, CCI, FMCE, BEMA, FCI, CSEM, LSCI)
+variable.names(lvl1)
+
+lvl1_cut <- lvl1_filt %>%
+  select(Assessment_Sequence_ID, PRE.score, POST.score, First_time, row,
+         Year_in_school, PCA, IMCA, GCA, CINS, CCI, FMCE, BEMA, FCI, CSEM, LSCI, 
+         male, female, Hispanic, black, white, asian, american_indian,hawaiian_or_other_pacific_islander)
 
 #New imputation code
 
@@ -36,8 +40,8 @@ library(Amelia)
 
 bds <- matrix(c(2, 3, 0, 0, 100, 100), nrow = 2, ncol = 3)
 
-a.out <- amelia(lvl1_cut, m = 5, idvars = c("Assessment_Sequence_ID"),
-                noms = NULL, ords = "Year_in_school", bounds = bds) 
+a.out <- amelia(lvl1_cut, m = 5, idvars = c("Assessment_Sequence_ID", "row"),
+                ords = "Year_in_school", bounds = bds) 
 
 lvl1_imp1 <- data.frame(a.out$imputations[[1]])
 lvl1_imp2 <- data.frame(a.out$imputations[[2]])
@@ -45,11 +49,11 @@ lvl1_imp3 <- data.frame(a.out$imputations[[3]])
 lvl1_imp4 <- data.frame(a.out$imputations[[4]])
 lvl1_imp5 <- data.frame(a.out$imputations[[5]])
 
-#cutdata <- lvl1_imp  %>%  
-#select(POST.score, PRE.score, First_time)
-
-#new_imp <- amelia(x=cutdata, m = 5) #This seems to work but I need to get it to write the data in the lvl1_imp file (plus pick which iteration)
-
+with(lvl1_imp1, cor(PRE.score,POST.score))
+with(lvl1_imp2, cor(PRE.score,POST.score))
+with(lvl1_imp3, cor(PRE.score,POST.score))
+with(lvl1_imp4, cor(PRE.score,POST.score))
+with(lvl1_imp5, cor(PRE.score,POST.score))
 
 #Old imputation code
 
