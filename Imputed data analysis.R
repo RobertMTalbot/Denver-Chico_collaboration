@@ -26,7 +26,12 @@ lvl1 <- left_join(lvl1, lvl2[,c("Assessment_Sequence_ID", "PCA", "IMCA", "GCA", 
 lvl1$PRE.Duration..Seconds.<-as.numeric(lvl1$PRE.Duration..Seconds.)
 lvl1$POST.Duration..Seconds.<-as.numeric(lvl1$POST.Duration..Seconds.)
 
-?as.numeric
+#create outputs for filters
+lowpre <-subset(lvl1, PRE.Duration..Seconds. > 1 & PRE.Duration..Seconds. <300)
+plot(lowpre$PRE.Duration..Seconds.,lowpre$PRE.score)
+lowpost <-subset(lvl1, POST.Duration..Seconds. > 1 & POST.Duration..Seconds. <300)
+plot(lowpost$POST.Duration..Seconds.,lowpost$POST.score)
+lvl1$Learning_gain
 
 lvl1_filt <- lvl1 %>%
   filter(Student.or.LA == 0) %>%
