@@ -29,6 +29,12 @@ lvl1$gender <- factor(lvl1$male*1 + lvl1$female*2 + lvl1$transgender*3 + lvl1$ot
 lvl1$instrument <- factor(lvl1$PCA*1 + lvl1$IMCA*2 + lvl1$GCA*3 + lvl1$CINS*4 + lvl1$CCI*5 + lvl1$FMCE*6 + lvl1$BEMA*7 + lvl1$FCI*8 + lvl1$CSEM*9 + lvl1$LSCI*10, labels = c(NA, "PCA", "IMCA", "GCA", "CINS", "CCI", "FMCE", "BEMA", "FCI", "CSEM", "LSCI"))
 lvl1$race <- factor(lvl1$white*1 + lvl1$black*2 + lvl1$asian*3 + lvl1$american_indian*4 + lvl1$hawaiian_or_other_pacific_islander*5 + lvl1$other.1*6, labels = c("NA", "white", "black", "asian", "american_indian", "hawaiian_or_other_pacific_islander", "race_other"))
 
+#white is Dom
+lvl1$race_URM <- factor(lvl1$white*1 + lvl1$black*2 + lvl1$asian*2 + lvl1$american_indian*2 + lvl1$hawaiian_or_other_pacific_islander*2 + lvl1$other.1*2, labels = c("NA", "Dom", "NonDom"))
+
+#male is Dom
+lvl1$gender_URM <- factor(lvl1$male*1 + lvl1$female*2 + lvl1$transgender*2 + lvl1$other*2, labels = c("NA", "Dom", "NonDom"))
+
 
 #Convert the student time data to numeric strings. The warning is not important.
 lvl1$PRE.Duration..Seconds.<-as.numeric(levels(lvl1$PRE.Duration..Seconds.)[lvl1$PRE.Duration..Seconds.])
@@ -91,105 +97,3 @@ lvl1_filt1 <- subset(lvl1_filt1, is.na(PRE.score)==FALSE | is.na(POST.score) == 
 #table(badgain$Assessment_Sequence_ID)
 
 ############################
-
-
-
-#select variables we'll be using
-
-#variable.names(lvl1_filt1) #it was easier to open the data.frame and compare to the list
-
-imp_pre <- lvl1_filt1 %>%
-  select(Assessment_Sequence_ID,PRE.Duration..Seconds.,POST.Duration..Seconds., PRE.score, POST.score, First_time, row,
-         Year_in_school, PCA, IMCA, GCA, CINS, CCI, FMCE, BEMA, FCI, CSEM, LSCI, 
-         male, female, transgender, other, Hispanic, black, white, asian, american_indian,hawaiian_or_other_pacific_islander, other.1, gender, instrument, race)
-
-#New imputation code
-#Right now we have 35% of the filtered data being complete cases. 84% of pre data and 43% of post data. It seems like 57 iterations is a good start, 65 might be more conservative
-library(Amelia)
-
-bds <- matrix(c(2, 3, 0, 0, 100, 100), nrow = 2, ncol = 3)
-
-a.out <- amelia(imp_pre, m = 5, idvars = c("Assessment_Sequence_ID", "row", "gender", "instrument", "race"),
-                ords = "Year_in_school", bounds = bds) 
-
-lvl1_imp1 <- data.frame(a.out$imputations[[1]])
-lvl1_imp2 <- data.frame(a.out$imputations[[2]])
-lvl1_imp3 <- data.frame(a.out$imputations[[3]])
-lvl1_imp4 <- data.frame(a.out$imputations[[4]])
-lvl1_imp5 <- data.frame(a.out$imputations[[5]])
-
-with(lvl1_imp1, cor(PRE.score,POST.score))
-with(lvl1_imp2, cor(PRE.score,POST.score))
-with(lvl1_imp3, cor(PRE.score,POST.score))
-with(lvl1_imp4, cor(PRE.score,POST.score))
-with(lvl1_imp5, cor(PRE.score,POST.score))
-
-
-#Calculate Cohen's d, LGcourse, and LGind
-
-lvl1_imp <- lvl1_imp1 %>% 
-  group_by(Assessment_Sequence_ID) %>%
-  select(Assessment_Sequence_ID, POST.score, PRE.score, row, PCA, IMCA, GCA, CINS, CCI, FMCE, BEMA, FCI, CSEM, LSCI, male, female, Hispanic, black, white, asian, american_indian,hawaiian_or_other_pacific_islander) %>%
-  na.omit() %>%
-  mutate(n1=length(PRE.score[!is.na(PRE.score)]),
-         n2=length(POST.score[!is.na(POST.score)]),
-         sd1=sd(PRE.score, na.rm=TRUE),
-         sd2=sd(POST.score, na.rm=TRUE),
-         CohensD=(POST.score-PRE.score)/sqrt(((n1-1)*sd1^2 + (n2-1)*sd2^2)/(n1+n2)),
-         Preave=mean(PRE.score, na.rm = TRUE),
-         Postave=mean(POST.score, na.rm = TRUE),
-         LGcourse=(POST.score-PRE.score)/(100-Preave),
-         LGind=(POST.score-PRE.score)/(100-PRE.score))
-
-# filter = things to keep
-
-lvl1_imp <- lvl1_imp %>%
-  filter(CohensD < 4 , CohensD > -1)%>%
-  filter(PRE.score < 100)
-#filter("PRE.Duration..Seconds." > 300) 
-#filter("POST.Duration..Seconds." > 300)
-# "|" is an or, "," is an and
-#filter(Instrument == 7 | Instrument == 8)  
-##filter(`Effect.size` > -2) # %>% # remove the previous # to add steps
-## filter(FCI == 1, FMCE == 1) %>%
-## filter(FMCE == 1)
-## filter(numstudent > 10) %>%
-
-
-#delete courses and students with <10 students (uses 2 datasets)
-
-x <- lvl1_imp %>%
-  select(Assessment_Sequence_ID, CohensD) %>%
-  na.omit() %>%
-  group_by(Assessment_Sequence_ID) %>%
-  summarise(n=n()) %>%
-  filter(n > 10)
-
-lvl1_imp <- lvl1_imp %>%
-  filter(Assessment_Sequence_ID %in% x$Assessment_Sequence_ID)
-
-lvl2_imp <- lvl2_imp %>%
-  filter(Assessment_Sequence_ID %in% x$Assessment_Sequence_ID)
-
-
-
-#multidimension outlier analysis
-
-library(mvoutlier)
-
-lvl1_3d <- lvl1_imp %>%
-  ungroup() %>%
-  select(CohensD,LGind,LGcourse)
-
-thingiwant <- aq.plot(lvl1_3d, alpha=0.1, quan=0.9)
-lvl1_imp$outliers <- thingiwant$outliers
-
-#Plots
-
-with(lvl1_imp, plot(CohensD, LGcourse))
-with(lvl1_imp, plot(LGind, LGcourse))
-with(lvl1_imp, plot(CohensD, LGind))
-
-library(rgl)
-
-with(filter(lvl1_imp, LGind>-2), plot3d(LGind, LGcourse, CohensD, col=factor(outliers, labels=c(1,2))))
