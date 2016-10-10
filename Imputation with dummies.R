@@ -12,10 +12,10 @@ imp_pre <- lvl1_filt1 %>%
 
 library(Amelia)
 
-bds <- matrix(c(2, 3, 0, 0, 100, 100), nrow = 2, ncol = 3)
+bds <- matrix(c(4, 5, 0, 0, 100, 100), nrow = 2, ncol = 3)
 
-a.out <- amelia(imp_pre, m = 3, idvars = c("assessment_sequence_id", "row", "instrument" ),
-                ords = "year_in_school", noms= c("race_URM", "gender_URM", "first_time", "PCA","IMCA","GCA","CINS","CCI","FMCE","BEMA","FCI","CSEM","LSCI"), bounds = bds) 
+a.out <- amelia(imp_pre, m = 3, idvars = c("assessment_sequence_id", "row", "instrument", "PCA" ),
+                ords = "year_in_school", bounds = bds) 
 
 lvl1_imp1 <- data.frame(a.out$imputations[[1]])
 lvl1_imp2 <- data.frame(a.out$imputations[[2]])

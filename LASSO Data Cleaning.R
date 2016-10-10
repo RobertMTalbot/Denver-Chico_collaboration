@@ -30,9 +30,9 @@ lvl1$instrument <- factor(lvl1$PCA*1 + lvl1$IMCA*2 + lvl1$GCA*3 + lvl1$CINS*4 + 
 #lvl1$race <- factor(lvl1$white*1 + lvl1$black*2 + lvl1$asian*3 + lvl1$american_indian*4 + lvl1$hawaiian_or_other_pacific_islander*5 + lvl1$other.1*6 + lvl1$hispanic*7 , labels = c(NA, "white", "black", "asian", "american_indian", "hawaiian_or_other_pacific_islander", "race_other","hispanic", "mixed", "mixed", "mixed", "mixed", "mixed", "mixed"))
 #I commented this out because while it works it gives a bunch of mixed labels for different combinationso f variables.
 #white is Dom
-lvl1$race_URM <- ifelse(lvl1$white==1 |lvl1$asian==1,"dom","nondom")
+lvl1$race_URM <- ifelse(lvl1$white==1 |lvl1$asian==1,0,1)
 #male is Dom
-lvl1$gender_URM <- ifelse(lvl1$male==1,"dom","nondom")
+lvl1$gender_URM <- ifelse(lvl1$male==1,0,1)
 
 #Filter out LA's 
 lvl1_filt <- lvl1 %>%
