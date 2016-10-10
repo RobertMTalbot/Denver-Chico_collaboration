@@ -46,14 +46,22 @@ matched_unfiltered <- subset(lvl1_filt1, is.na(pre_score)==FALSE & is.na(post_sc
 save(matched_unfiltered,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/matched_unfiltered")
 
 #For students that took less than 300 seconds on the pre or post test 
-lvl1_filt1$pre_score[lvl1_filt1$PRE.Duration..Seconds.<300]<- NA
-lvl1_filt1$post_score[lvl1_filt1$POST.Duration..Seconds.<300]<- NA
+lvl1_filt1$pre_score[lvl1_filt1$pre_duration <300]<- NA
+lvl1_filt1$post_score[lvl1_filt1$post_duration<300]<- NA
+time_filtered <- subset(lvl1_filt1, is.na(pre_score)==FALSE | is.na(post_score)== FALSE)
+lvl1_filt1$pre_score[lvl1_filt1$pre_answered <80]<- NA
+lvl1_filt1$post_score[lvl1_filt1$post_answered<80]<- NA
+answered_filtered <- subset(lvl1_filt1, is.na(pre_score)==FALSE | is.na(post_score)== FALSE)
+
+
 #Calculate raw gains for filtered data
 lvl1_filt1$absgain <- lvl1_filt1$post_score - lvl1_filt1$pre_score
+
 
 #Calculate the Z scores for the absolute gains by instrument to filter out decreases greater than 2 SD
 lvl1_filt1$Zabsgain <- ave(lvl1_filt1$absgain, lvl1_filt1$instrument, FUN=scale)
 lvl1_filt1$post_score[lvl1_filt1$Zabsgain< -2 ]<- NA
+gain_filtered <- subset(lvl1_filt1, is.na(pre_score)==FALSE | is.na(post_score)== FALSE)
 
 #Create and save a matched filtered data set
 matched_filtered <- subset(lvl1_filt1, is.na(pre_score)==FALSE & is.na(post_score)== FALSE)
