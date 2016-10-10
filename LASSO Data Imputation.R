@@ -4,7 +4,7 @@
 
 imp_pre <- lvl1_filt1 %>%
   select(assessment_sequence_id, pre_duration, post_duration, pre_score, post_score, first_time, row,
-         year_in_school, instrument, race_URM, gender_URM)
+         year_in_school, instrument, race_URM, gender_URM, PCA,IMCA,GCA,CINS,CCI,FMCE,BEMA,FCI,CSEM,LSCI)
 
 #New imputation code
 #Right now we have 35% of the filtered data being complete cases. 84% of pre data and 43% of post data. It seems like 57 iterations is a good start, 65 might be more conservative
@@ -14,10 +14,11 @@ library(Amelia)
 
 bds <- matrix(c(4, 5, 0, 0, 100, 100), nrow = 2, ncol = 3)
 
-a.out <- amelia(imp_pre, m = 5, idvars = c("assessment_sequence_id", "row" ),
-                ords = "year_in_school", noms= c("instrument"), bounds = bds) 
+a.out <- amelia(imp_pre, m = 10, idvars = c("assessment_sequence_id", "row", "instrument", "PCA" ),
+                ords = "year_in_school", bounds = bds) 
 
-unique(lvl1_filt1$race_URM)
+
+
 
 lvl1_imp1 <- data.frame(a.out$imputations[[1]])
 lvl1_imp2 <- data.frame(a.out$imputations[[2]])
