@@ -72,7 +72,7 @@ save(matched_filtered,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASS
 lvl1_filt1 <- subset(lvl1_filt1, is.na(pre_score)==FALSE | is.na(post_score) == FALSE)
 
 #############This cleans up the workspace
-#rm(answered_filtered, gain_filtered, actual_data,answered_filtered,time_filtered,lvl1_filt)
+rm(answered_filtered, gain_filtered, actual_data,time_filtered,lvl1_filt)
 
 #######These numbers should add up to the number of observations in lvl1_filt1
 #thing <- subset(lvl1_filt1, is.na(pre_score)==FALSE  & is.na(post_score)==FALSE)
