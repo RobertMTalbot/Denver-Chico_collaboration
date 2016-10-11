@@ -14,7 +14,7 @@ library(Amelia)
 
 bds <- matrix(c(4, 5, 0, 0, 100, 100), nrow = 2, ncol = 3)
 
-a.out <- amelia(imp_pre, m = 3, idvars = c("assessment_sequence_id", "row", "instrument", "PCA" ),
+a.out <- amelia(imp_pre, m = 10, idvars = c("assessment_sequence_id", "row", "instrument", "PCA" ),
                 ords = "year_in_school", bounds = bds) 
 
 lvl1_imp1 <- data.frame(a.out$imputations[[1]])
