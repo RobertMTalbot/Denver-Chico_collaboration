@@ -93,4 +93,5 @@ lvl2_imp_ave$g_c<-with(lvl2_imp_ave,{(post_score-pre_score)/(100-pre_score)})
 library(dplyr)
 lvl2_imp <-filter(lvl2_imp_ave, class_n>9)
 
-save(a.out,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/lvl2_imp_ave")
+save(lvl2_imp_ave,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/lvl2_imp_ave")
+
