@@ -71,6 +71,12 @@ save(matched_filtered,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASS
 # remove the students that did not provide either a pre or a post test  
 lvl1_filt1 <- subset(lvl1_filt1, is.na(pre_score)==FALSE | is.na(post_score) == FALSE)
 
+lvl1_filt1$pre_missing <- ifelse(is.na(lvl1_filt1$pre_score) == TRUE, 1,0)
+lvl1_filt1$post_missing <- ifelse(is.na(lvl1_filt1$post_score) == TRUE, 1,0)
+lvl1_filt1$missing <- ifelse(is.na(lvl1_filt1$pre_score) == TRUE | is.na(lvl1_filt1$post_score) == TRUE, 1,0)
+
+save(lvl1_filt1,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/lvl1_filt1")
+
 #############This cleans up the workspace
 rm(answered_filtered, gain_filtered, actual_data,time_filtered,lvl1_filt)
 
