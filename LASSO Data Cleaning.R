@@ -71,10 +71,22 @@ save(matched_filtered,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASS
 # remove the students that did not provide either a pre or a post test  
 lvl1_filt1 <- subset(lvl1_filt1, is.na(pre_score)==FALSE | is.na(post_score) == FALSE)
 
+#### filtering out the courses with too much missing data.
 lvl1_filt1$pre_missing <- ifelse(is.na(lvl1_filt1$pre_score) == TRUE, 1,0)
 lvl1_filt1$post_missing <- ifelse(is.na(lvl1_filt1$post_score) == TRUE, 1,0)
 lvl1_filt1$missing <- ifelse(is.na(lvl1_filt1$pre_score) == TRUE | is.na(lvl1_filt1$post_score) == TRUE, 1,0)
 
+pre.missing<-aggregate(pre_missing~assessment_sequence_id, lvl1_filt1,mean)
+post.missing<-aggregate(post_missing~assessment_sequence_id, lvl1_filt1,mean)
+missing <- merge(pre.missing,post.missing, by = "assessment_sequence_id")
+colnames(missing)[2]<-"pre_missing_course"
+colnames(missing)[3]<-"post_missing_course"
+lvl1_filt1<-merge(lvl1_filt1,missing, by="assessment_sequence_id")
+
+lvl1_filt_missing <- subset(lvl1_filt1,post_missing_course <0.60)
+lvl1_filt_missing_both <- subset(lvl1_filt_missing, pre_missing_course <0.60)
+
+lvl1_filt1<-lvl1_filt_missing_both
 save(lvl1_filt1,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/lvl1_filt1")
 
 #############This cleans up the workspace

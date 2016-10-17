@@ -2,10 +2,13 @@ load("/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/lvl2_imp_av
 load("/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/fil_lvl2")
 load("/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/unfil_lvl2")
 lvl2 <- read.csv("/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Data/HLM_LASSO_Dump_S2_S3_lvl2.csv")
-
+library(dplyr)
 #x = MI, y= matched
 miandmatch<- left_join(lvl2_imp_ave,fil_lvl2,by = "assessment_sequence_id")
-miandmatch<- left_join(miandmatch,lvl2,by = "assessment_sequence_id")
+miandmatch<- left_join(lvl2_imp_ave,lvl2,by = "assessment_sequence_id")
+
+library(xlsx)
+write.xlsx(miandmatch, "/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/miandmatch.xlsx") 
 
 # plots of d for MI and matched data
 with(miandmatch[miandmatch$class_n.y > 19,], plot(d.x, d.y, xlab= "d mi", ylab="d matched", xlim=c(0,3), ylim=c(0,3) ,main="n>19"))
