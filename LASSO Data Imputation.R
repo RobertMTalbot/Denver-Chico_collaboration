@@ -38,6 +38,12 @@ pre.missing<-aggregate(pre_missing~assessment_sequence_id, temp,mean)
 post.missing<-aggregate(post_missing~assessment_sequence_id, temp,mean)
 missing<-aggregate(missing~assessment_sequence_id, temp,mean)
 
+##Getting the URM's into the data set
+URMgender<-aggregate(gender_URM~assessment_sequence_id, temp,mean)
+URMrace<-aggregate(race_URM~assessment_sequence_id, temp,mean)
+URM <- merge(URMrace,URMgender, by = "assessment_sequence_id")
+
+
 #These establish the base data frames that the other ones feed into. The N is the same for all so I will write it in later. THe next thing to do is write th for loops.
 
 #This is the loops to generate the data frames for means, sds and g_i.
@@ -100,8 +106,16 @@ lvl2_imp_ave$g_c<-with(lvl2_imp_ave,{(post_score-pre_score)/(100-pre_score)})
 
 library(dplyr)
 lvl2_imp <-filter(lvl2_imp_ave, class_n>9)
-
+lvl2_imp <-filter(lvl2_imp, CINS =0) ## Removed this test because it produced high pre test outliers.
 colnames(lvl2_imp_ave)[1]<-"assessment_sequence_id"
+colnames(lvl2_imp)[1] <- "assessment_sequence_id"
+lvl2_imp<-merge(lvl2_imp,lvl2, by ="assessment_sequence_id")
+lvl2_imp <-filter(lvl2_imp, CINS ==0)
+
+esdata <- lvl2_imp
+
+esdata <- left_join(esdata, URM, by="assessment_sequence_id")
+save(esdata,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/esdata")
 
 save(lvl2_imp_ave,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/lvl2_imp_ave_miss_fil")
 
