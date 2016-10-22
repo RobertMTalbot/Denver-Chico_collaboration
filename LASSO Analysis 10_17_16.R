@@ -92,13 +92,48 @@ boot <- boot.relimp(d~pre_score + race_URM + gender_URM, data=esdata)
 booteval.relimp(boot) # print result
 plot(booteval.relimp(boot,sort=TRUE)) # plot result 
 
-with(esdata, cor(d,pre_score))
-with(esdata, cor(g_c,pre_score))
+###Doing the correlations
+library(dplyr)
+physdataforcor <- filter(esdata, Physics==1)
+phys <- data.frame("g_c" = physdataforcor$g_c, "d" = physdataforcor$d, "pre_score" = physdataforcor$pre_score, "gender_URM"=physdataforcor$gender_URM,"race_URM"=physdataforcor$race_URM) 
+cor(notphys)
 
-with(esdata, cor(d,race_URM))
-with(esdata, cor(g_c,race_URM))
+dataforcor <- data.frame("g_c" = esdata$g_c, "d" = esdata$d, "pre_score" = esdata$pre_score, "gender_URM"=esdata$gender_URM,"race_URM"=esdata$race_URM) 
+cor(dataforcor)
 
-with(esdata, cor(d,gender_URM))
-with(esdata, cor(g_c,gender_URM))
 
 with(esdata[esdata$Physics=="1",], plot(gender_URM, d))
+
+#########gets at the useful information in the Linear regressions
+
+fit<-lm(g_c~ pre_score + race_URM + gender_URM, data=esdata)
+summary.lm(fit)
+plot(fit)
+
+with(esdata, plot(post_score, post_sd, xlim = c(0,100)))
+with(esdata, points(pre_score, post_sd, col=4))
+
+###########################################################
+# Basic Scatterplot Matrix
+pairs(~d+g_c+pre_score+gender_URM+race_URM,data=fcidata,main="Scatterplot Matrix for All Data")
+
+cor(fcidata)
+
+fit<-lm(d~ pre_score + race_URM + gender_URM, data=fcidata)
+summary.lm(fit)
+plot(fit)
+
+# Calculate Relative Importance for Each Predictor
+library(relaimpo)
+calc.relimp(d~pre_score + race_URM + gender_URM, data=fcidata)
+# Bootstrap Measures of Relative Importance (1000 samples)
+boot <- boot.relimp(d~pre_score + race_URM + gender_URM, data=fcidata)
+booteval.relimp(boot) # print result
+plot(booteval.relimp(boot,sort=TRUE)) # plot result 
+
+calc.relimp(g_c~pre_score + race_URM + gender_URM, data=fcidata)
+# Bootstrap Measures of Relative Importance (1000 samples)
+boot <- boot.relimp(g_c~pre_score + race_URM + gender_URM, data=fcidata)
+booteval.relimp(boot) # print result
+plot(booteval.relimp(boot,sort=TRUE)) # plot result 
+
