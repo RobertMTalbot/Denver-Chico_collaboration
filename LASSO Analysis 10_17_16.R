@@ -1,8 +1,33 @@
 load(file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/esdata")
 
+# generate IE code
+esdata$acteng <- ifelse(esdata$lec_clickers==0 & esdata$lec_small_groups==0 & esdata$collab_learning_during_class==0, 0, 1)
+
 esdata$absgain<-  esdata$post_score-esdata$pre_score
 
+
+##analysis for VanKorff Paper
 cor(esdata$pre_score,esdata$absgain)
+cor(esdata$pre_score,esdata$g_c)
+fit<-lm(post_score~ pre_score, data=esdata)
+summary.lm(fit)
+plot(fit)
+
+with(esdata[esdata$FCI==1 & esdata$acteng==1,], cor(pre_score, g_c))
+  with(esdata[esdata$FCI==1 & esdata$acteng==1,], length(pre_score))
+with(esdata[esdata$FCI==1 & esdata$acteng==0,], cor(pre_score, g_c))
+  with(esdata[esdata$FCI==1 & esdata$acteng==0,], length(pre_score))
+with(esdata[esdata$FMCE==1 & esdata$acteng==1,], cor(pre_score, g_c))
+  with(esdata[esdata$FMCE==1 & esdata$acteng==1,], length(pre_score))
+with(esdata[esdata$FMCE==1 & esdata$acteng==0,], cor(pre_score, g_c))
+  with(esdata[esdata$FMCE==1 & esdata$acteng==0,], length(pre_score))
+
+fit <-with(esdata[esdata$FCI==1 | esdata$FMCE==1,], aov(g_c~pre_score + FCI + acteng))
+summary.aov(fit)
+
+
+with(esdata[esdata$FCI==1,],cor(pre_score,g_c))
+with(esdata[esdata$FMCE==1,],cor(pre_score,g_c))
 
 ### Compare g_i and g_c
 with(esdata, plot(g_c,g_i))
