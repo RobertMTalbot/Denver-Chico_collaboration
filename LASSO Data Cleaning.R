@@ -8,8 +8,8 @@ lvl1 <- read.csv("/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Data/HLM
 lvl2 <- read.csv("/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Data/HLM_LASSO_Dump_S2_S3_lvl2.csv")
 
 #BVD read in (laptop & home)
-lvl1 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl1.csv")
-lvl2 <- read.csv("/Users/bvd/Denver-Chico_collaboration/HLM_LASSO_Dump_S2_S3_lvl2.csv")
+lvl1 <- read.csv("/Users/bvd/Dropbox/work/Research/LASSO/Data/HLM_LASSO_Dump_S2_S3_lvl1.csv")
+lvl2 <- read.csv("/Users/bvd/Dropbox/work/Research/LASSO/Data/HLM_LASSO_Dump_S2_S3_lvl2.csv")
 
 #BVD read in (work)
 lvl1 <- read.csv("/Users/bvandusen/Dropbox/work/Research/LASSO/data/HLM_LASSO_Dump_S2_S3_lvl1.csv")
