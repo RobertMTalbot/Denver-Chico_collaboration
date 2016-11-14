@@ -207,8 +207,36 @@ equity_data <- merge(equity_data,temp, by="assessment_sequence_id")
 
 equity_data$delta_d <- equity_data$d_m - equity_data$d_f
 equity_data$delta_g <- equity_data$g_c_m-equity_data$g_c_f
+equity_data$coloring <- with( equity_data,ifelse(pre_score_f< pre_score_m, 1 ,0))
+equity_data$quad <- with(equity_data, {ifelse(delta_g >0 & delta_d>0,1, ifelse(delta_g >0 & delta_d<0, 2, ifelse(delta_g <0 & delta_d<0,3,4)))})
+equity_data$delta_pre <- equity_data$pre_score_m-equity_data$pre_score_f
+equity_data$delta_pre_sd <- equity_data$pre_sd_m-equity_data$pre_sd_f
+equity_data$delta_absgain <- with(equity_data, {post_score_m-pre_score_m -(post_score_f-pre_score_f)})
+equity_data$delta_es <- with(equity_data,{abs(delta_d-(2.41*delta_g))}) # 2.41 is the conversion from earlier analysis
 
 #Analysis
-with(equity_data, plot(delta_d,delta_g)) # I want to color code these by male greater than female on pre
+with(equity_data, plot(delta_d,delta_g, col=coloring+1, pch=coloring+24)) # I want to color code these by male greater than female on pre
 abline(h=0)
 abline(v=0)
+
+fil <- filter(equity_data, quad==2)
+
+library(xlsx)
+write.xlsx(fil, "/Users/kerstin/Desktop/quadII.xlsx") 
+
+#Analysis to parse out the relationship between the disagreement in d and g with delat_pre_score and delta_pre_sd
+fit <- lm(delta_es~ delta_pre + delta_pre_sd + delta_pre*delta_pre_sd, data=equity_data)
+summary.lm(fit)
+
+# Calculate Relative Importance for Each Predictor
+library(relaimpo)
+
+calc.relimp(delta_es~ delta_pre*delta_pre_sd + delta_pre + delta_pre_sd , data=equity_data)
+# Bootstrap Measures of Relative Importance (1000 samples)
+boot <- boot.relimp(delta_es~ delta_pre*delta_pre_sd + delta_pre + delta_pre_sd , data=equity_data)
+booteval.relimp(boot) # print result
+plot(booteval.relimp(boot,sort=TRUE)) # plot result 
+
+#Correlations
+library(Hmisc)
+rcorr(with(equity_data,cbind(pre_score_f, pre_sd_f, d_f, g_c_f,pre_score_m, pre_sd_m, d_m, g_c_m )))

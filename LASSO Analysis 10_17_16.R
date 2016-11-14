@@ -1,4 +1,10 @@
+#what is here
+#similar analysis to Vankorff, lm for pooling data, correlations between es and pre, looking at individual instructors,
+#linear regressions between es and pre and URM with nice table it porduces.
 load(file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/esdata")
+#lvl2 <- read.csv("/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Data/HLM_LASSO_Dump_S2_S3_lvl2.csv")
+#esdata<-merge(esdata,lvl2, by ="assessment_sequence_id")
+#esdata<-esdata[esdata$CINS==0,]
 
 # generate IE code
 esdata$acteng <- ifelse(esdata$lec_clickers==0 & esdata$lec_small_groups==0 & esdata$collab_learning_during_class==0, 0, 1)
@@ -9,6 +15,7 @@ esdata$absgain<-  esdata$post_score-esdata$pre_score
 ##analysis for VanKorff Paper
 cor(esdata$pre_score,esdata$absgain)
 cor(esdata$pre_score,esdata$g_c)
+cor(esdata$pre_score,esdata$d)
 fit<-lm(post_score~ pre_score, data=esdata)
 summary.lm(fit)
 plot(fit)
@@ -24,10 +31,26 @@ with(esdata[esdata$FMCE==1 & esdata$acteng==0,], cor(pre_score, g_c))
 
 fit <-with(esdata[esdata$FCI==1 | esdata$FMCE==1,], aov(g_c~pre_score + FCI + acteng))
 summary.aov(fit)
+fit <-with(esdata[esdata$FCI==1 | esdata$FMCE==1,], aov(g_c~  FCI + acteng+pre_score))
+summary.aov(fit)
 
+fit <-with(esdata[esdata$FCI==1 | esdata$FMCE==1,], aov(d~pre_score + FCI + acteng))
+summary.aov(fit)
+fit <-with(esdata[esdata$FCI==1 | esdata$FMCE==1,], aov(d~ acteng + FCI + pre_score ))
+summary.aov(fit)
 
 with(esdata[esdata$FCI==1,],cor(pre_score,g_c))
 with(esdata[esdata$FMCE==1,],cor(pre_score,g_c))
+
+fit<- lm(g_c~  PCA + IMCA + CCI + FMCE + BEMA + FCI + CSEM + LSCI + pre_score , data=esdata)
+summary.lm(fit)
+fit<- lm(d~ pre_score + PCA + IMCA + CCI + FMCE + BEMA + FCI + CSEM + LSCI, data=esdata)
+summary.lm(fit)
+
+fit<- lm(g_c~ pre_score , data=esdata)
+summary.lm(fit)
+fit<- lm(d~ pre_score , data=esdata)
+summary.lm(fit)
 
 ### Compare g_i and g_c
 with(esdata, plot(g_c,g_i))
@@ -162,3 +185,29 @@ boot <- boot.relimp(g_c~pre_score + race_URM + gender_URM, data=fcidata)
 booteval.relimp(boot) # print result
 plot(booteval.relimp(boot,sort=TRUE)) # plot result 
 
+
+###Analysis to look at disagrements between d and g in the esdata set
+esdata$delta_es <- with(esdata,{abs(d-(2.41*g_c))}) # 2.41 is the conversion from earlier analysis
+
+
+#Analysis to parse out the relationship between the disagreement in d and g with delat_pre_score and delta_pre_sd
+fit <- lm(delta_es~ pre_score + pre_sd+ pre_score*pre_sd, data=esdata)
+summary.lm(fit)
+
+# Calculate Relative Importance for Each Predictor
+library(relaimpo)
+
+calc.relimp(delta_es~ pre_score + pre_sd+ pre_score*pre_sd, data=esdata)
+# Bootstrap Measures of Relative Importance (1000 samples)
+boot <- boot.relimp(delta_es~ pre_score + pre_sd+ pre_score*pre_sd, data=esdata)
+booteval.relimp(boot) # print result
+plot(booteval.relimp(boot,sort=TRUE)) # plot result 
+
+ cor(esdata$pre_sd,esdata$pre_score)
+ cor(esdata$pre_sd,esdata$d)
+ cor(esdata$pre_score,esdata$d)
+ 
+ library(Hmisc)
+ rcorr(cbind(esdata$pre_score,esdata$pre_sd, esdata$d,esdata$g_c))
+ plot(esdata$pre_score,esdata$pre_sd)
+ 
