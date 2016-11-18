@@ -134,3 +134,10 @@ save(esdata,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis
 
 save(lvl2_imp_ave,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/lvl2_imp_ave_miss_fil")
 
+
+############## Data analysis on the MI data
+#Correlations between the three g's
+
+#Correlations between d, g, prescore, post score, absgain, pre sd, post sd
+
+# MLR between g, d, pre score, post score

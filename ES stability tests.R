@@ -94,5 +94,82 @@ dstabper$d4 <- (dstab$d4-dstab$d0)/dstab$d0
 
 estabper<-merge(dstabper,gstabper, by= "esd.assessment_sequence_id")
 estabper$N<-esd$post_score
-library(xlsx)
-write.xlsx(estabper, "/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/estabper.xlsx")
+
+
+estabper<-subset(estabper,estabper$N>9)
+estabper<-subset(estabper,estabper$esd.assessment_sequence_id!=137 ) # Removes the CINS data to give the 89 courses used in the other analyses
+estabper<-subset(estabper,estabper$esd.assessment_sequence_id!= 322)
+
+#Making a box plot using the estabper data set
+
+df <- subset(estabper, select = c(2,6,3,7,4,8,5,9))
+df <- df*100
+boxplot(df, at =c(1,2, 4,5, 7,8, 10,11), 
+        col=c("red","royalblue2","red","royalblue2","red","royalblue2","red","royalblue2"), 
+        ylim=c(0,120), outline=FALSE, xaxt="n", 
+        xlab="Number of Outliers Added", ylab="Percentage Increase",
+        main="Stability of Effect Size Measures")
+        legend(1,114, c(expression(italic("d")),expression(bold("g"))), fill = c("red","royalblue2"))
+axis(1,at=c(1.5,4.5,7.5,10.5), labels=c(1,2,3,4))
+
+
+ # Running a repeated measures ANOVA on the data
+ es_aov_dat <- estabper[1:2]
+ es_aov_dat$outliers<-1
+ es_aov_dat$es<-"d"
+ colnames(es_aov_dat) <- c("id", "change", "outliers","es")
+ 
+ tempx <- data.frame(estabper[1],estabper[3])
+ tempx$outliers<-2
+ tempx$es<-"d"
+ colnames(tempx) <- c("id", "change", "outliers","es")
+ 
+ es_aov_dat<- rbind.data.frame(es_aov_dat,tempx)
+ 
+ tempx <- data.frame(estabper[1],estabper[4])
+ tempx$outliers<-3
+ tempx$es<-"d"
+ colnames(tempx) <- c("id", "change", "outliers","es")
+ 
+ es_aov_dat<- rbind.data.frame(es_aov_dat,tempx)
+ 
+ tempx <- data.frame(estabper[1],estabper[5])
+ tempx$outliers<-4
+ tempx$es<-"d"
+ colnames(tempx) <- c("id", "change", "outliers","es")
+ 
+ es_aov_dat<- rbind.data.frame(es_aov_dat,tempx)
+ 
+ ##
+   tempx <- data.frame(estabper[1],estabper[6])
+ tempx$outliers<-1
+ tempx$es<-"g"
+ colnames(tempx) <- c("id", "change", "outliers","es")
+ es_aov_dat<- rbind.data.frame(es_aov_dat,tempx)
+ 
+ tempx <- data.frame(estabper[1],estabper[7])
+ tempx$outliers<-2
+ tempx$es<-"g"
+ colnames(tempx) <- c("id", "change", "outliers","es")
+ es_aov_dat<- rbind.data.frame(es_aov_dat,tempx)
+ 
+   tempx <- data.frame(estabper[1],estabper[8])
+ tempx$outliers<-3
+ tempx$es<-"g"
+ colnames(tempx) <- c("id", "change", "outliers","es")
+ es_aov_dat<- rbind.data.frame(es_aov_dat,tempx)
+ 
+ tempx <- data.frame(estabper[1],estabper[9])
+ tempx$outliers<-4
+ tempx$es<-"g"
+ colnames(tempx) <- c("id", "change", "outliers","es")
+ es_aov_dat<- rbind.data.frame(es_aov_dat,tempx)
+
+###estab aov
+  esstab.aov <- with(es_aov_dat,{aov(change~outliers*es)})
+ summary(esstab.aov)
+
+ median(estabper$d1)
+ median(estabper$g1)
+ 
+ median(estabper$g1)

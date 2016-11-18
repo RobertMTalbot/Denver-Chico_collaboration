@@ -44,7 +44,24 @@ actual_data <- subset(lvl1_filt, is.na(pre_score)==FALSE | is.na(post_score)== F
 #create and save an unfiltered data set of matched test data
 matched_unfiltered <- subset(lvl1_filt1, is.na(pre_score)==FALSE & is.na(post_score)==FALSE)
 save(matched_unfiltered,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/matched_unfiltered")
+############
+#### filtering out the courses with too much missing data.
+lvl1_filt1$pre_missing <- ifelse(is.na(lvl1_filt1$pre_score) == TRUE, 1,0)
+lvl1_filt1$post_missing <- ifelse(is.na(lvl1_filt1$post_score) == TRUE, 1,0)
+lvl1_filt1$missing <- ifelse(is.na(lvl1_filt1$pre_score) == TRUE | is.na(lvl1_filt1$post_score) == TRUE, 1,0)
 
+pre.missing<-aggregate(pre_missing~assessment_sequence_id, lvl1_filt1,mean)
+post.missing<-aggregate(post_missing~assessment_sequence_id, lvl1_filt1,mean)
+missing <- merge(pre.missing,post.missing, by = "assessment_sequence_id")
+colnames(missing)[2]<-"pre_missing_course"
+colnames(missing)[3]<-"post_missing_course"
+lvl1_filt1<-merge(lvl1_filt1,missing, by="assessment_sequence_id")
+
+lvl1_filt_missing <- subset(lvl1_filt1,post_missing_course <0.99)
+lvl1_filt_missing_both <- subset(lvl1_filt_missing, pre_missing_course <0.99)
+lvl1_filt1<-lvl1_filt_missing_both
+
+########
 #For students that took less than 300 seconds on the pre or post test 
 lvl1_filt1$pre_score[lvl1_filt1$pre_duration <300]<- NA
 lvl1_filt1$post_score[lvl1_filt1$post_duration<300]<- NA
@@ -79,12 +96,12 @@ lvl1_filt1$missing <- ifelse(is.na(lvl1_filt1$pre_score) == TRUE | is.na(lvl1_fi
 pre.missing<-aggregate(pre_missing~assessment_sequence_id, lvl1_filt1,mean)
 post.missing<-aggregate(post_missing~assessment_sequence_id, lvl1_filt1,mean)
 missing <- merge(pre.missing,post.missing, by = "assessment_sequence_id")
-colnames(missing)[2]<-"pre_missing_course"
-colnames(missing)[3]<-"post_missing_course"
+colnames(missing)[2]<-"pre_missing_course1"
+colnames(missing)[3]<-"post_missing_course1"
 lvl1_filt1<-merge(lvl1_filt1,missing, by="assessment_sequence_id")
 
-lvl1_filt_missing <- subset(lvl1_filt1,post_missing_course <0.60)
-lvl1_filt_missing_both <- subset(lvl1_filt_missing, pre_missing_course <0.60)
+lvl1_filt_missing <- subset(lvl1_filt1,post_missing_course1 <0.60)
+lvl1_filt_missing_both <- subset(lvl1_filt_missing, pre_missing_course1 <0.60)
 
 lvl1_filt1<-lvl1_filt_missing_both
 save(lvl1_filt1,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/lvl1_filt1")
