@@ -18,7 +18,7 @@ bds <- matrix(c(4, 5, 0, 0, 100, 100), nrow = 2, ncol = 3)
 
 m=52
 
-a.out <- amelia(imp_pre, m = m, idvars = c("assessment_sequence_id", "row", "instrument", "PCA", "pre_missing","post_missing","missing" ),
+a.out <- amelia(imp_pre, m = m, idvars = c("assessment_sequence_id", "row", "instrument", "PCA", "pre_missing","post_missing","missing", "CINS" ),
                 ords = "year_in_school", bounds = bds) 
 # add the individual gain to the imputed data
 save(a.out,file="/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Analysis/aout")

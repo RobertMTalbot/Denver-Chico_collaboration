@@ -215,9 +215,10 @@ equity_data$delta_absgain <- with(equity_data, {post_score_m-pre_score_m -(post_
 equity_data$delta_es <- with(equity_data,{abs(delta_d-(2.41*delta_g))}) # 2.41 is the conversion from earlier analysis
 
 #Analysis
-with(equity_data, plot(delta_d,delta_g, col=coloring+1, pch=coloring+24)) # I want to color code these by male greater than female on pre
+with(equity_data, plot(delta_d,delta_g, col=coloring+1, pch=coloring+24, main=expression("Comparison of Gender Differences for"~italic(d)~"and"~bold(g)), xlab=expression(italic("d")["Male"]*" - "*italic("d")["Female"]), ylab=expression(bold("g")["Male"]*" - "*bold("g")["Female"])   )) # I want to color code these by male greater than female on pre
 abline(h=0)
 abline(v=0)
+legend("bottomright", c("F > M Pretest Mean","M > F Pretest Mean"), col=c(1,2), pch=c(24,25))
 
 fil <- filter(equity_data, quad==2)
 
@@ -240,3 +241,12 @@ plot(booteval.relimp(boot,sort=TRUE)) # plot result
 #Correlations
 library(Hmisc)
 rcorr(with(equity_data,cbind(pre_score_f, pre_sd_f, d_f, g_c_f,pre_score_m, pre_sd_m, d_m, g_c_m )))
+
+#More analysis for gender differences in FCI data
+lvl2 <- read.csv("/Users/kerstin/Documents/LA Postdoc stuff/RData/LASSO/Data/HLM_LASSO_Dump_S2_S3_lvl2.csv")
+stuff<-merge(equity_data,lvl2, by="assessment_sequence_id")
+
+with(stuff[stuff$FCI==1,], plot(post_score_f,post_score_m))
+abline(0,1)
+with(stuff[stuff$FCI==1,], plot(pre_score_f,pre_score_m))
+abline(0,1)
